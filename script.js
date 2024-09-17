@@ -1,8 +1,7 @@
 // Google Sheets API URL
-const SHEET_ID = '1GQhHMtDrv94vG7ah3isEDy57VMaYCnQGS-MEG3kCGtM'; // Replace with your actual Sheet ID
-const SHEET_URL = `https://spreadsheets.google.com/feeds/list/${SHEET_ID}/od6/public/values?alt=json`;
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNb-sN160plE95VvLO2-YNLez--vRTZINYB-OEPMidEEcN-XzVcs6-3PxJ01N2qOp2EkOMS_U3_sKn/pub?output=csv';
 
-// Fetch the data from Google Sheets CSV
+// Fetch the CSV data from Google Sheets
 async function fetchMovies() {
     try {
         const response = await fetch(SHEET_URL);
