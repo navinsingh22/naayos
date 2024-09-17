@@ -19,8 +19,7 @@ async function fetchMovies() {
             image: row['Image URL'],
             links: {
                 'Netflix': row['Netflix Link'],
-                'Amazon Prime': row['Amazon Prime Link'],
-                'Hulu': row['Hulu Link']
+                'Amazon Prime': row['Amazon Prime Link']
             }
         }));
 
