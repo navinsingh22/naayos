@@ -1,24 +1,24 @@
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNb-sN160plE95VvLO2-YNLez--vRTZINYB-OEPMidEEcN-XzVcs6-3PxJ01N2qOp2EkOMS_U3_sKn/pub?output=xlsx';
+const XLSX_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNb-sN160plE95VvLO2-YNLez--vRTZINYB-OEPMidEEcN-XzVcs6-3PxJ01N2qOp2EkOMS_U3_sKn/pub?output=xlsx';
 
-// Fetch and parse CSV using PapaParse
 async function fetchMovies() {
     try {
-        const response = await fetch(SHEET_URL);
-        const csvData = await response.text();
+        const response = await fetch(XLSX_URL);
+        const arrayBuffer = await response.arrayBuffer();
+        
+        // Parse the XLSX file
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const sheetName = workbook.SheetNames[0]; // Get the first sheet
+        const sheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(sheet);
 
-        // Parse CSV data using PapaParse
-        const parsedData = Papa.parse(csvData, { header: true });
-        console.log("Parsed data:", parsedData.data); // Check parsed data
+        console.log("Parsed data:", data); // Debugging: check the data
 
-        // Clean up any extra quotes around URLs
-        const movies = parsedData.data.map(row => {
-            return {
-                title: row['title'],
-                description: row['description'],
-                image: row['image'].replace(/^""|""$/g, ''), // Remove extra double quotes
-                link: row['link'].replace(/^""|""$/g, '') // Remove extra double quotes
-            };
-        });
+        const movies = data.map(row => ({
+            title: row['title'],
+            description: row['description'],
+            image: row['image'],
+            link: row['link']
+        }));
 
         return movies;
     } catch (error) {
