@@ -13,19 +13,21 @@ async function fetchMovies() {
 
         console.log("Parsed data:", data); // Debugging: check the data
 
+        // Map data with proper keys
         const movies = data.map(row => ({
-            title: row['Title'],
-            description: row['Description'],
-            image: row['Image URL'],
+            title: row['Title'] || 'No title available',
+            description: row['Description'] || 'No description available',
+            image: row['Image URL'] || 'https://via.placeholder.com/150', // Default image if none provided
             links: {
-                'Netflix': row['Netflix Link'],
-                'Amazon Prime': row['Amazon Prime Link'],
+                'Netflix': row['Netflix Link'] || '',
+                'Amazon Prime': row['Amazon Prime Link'] || ''
             }
         }));
 
         return movies;
     } catch (error) {
         console.error("Error fetching movies:", error);
+        return []; // Return empty array in case of error
     }
 }
 
@@ -39,14 +41,11 @@ async function renderMovies() {
             return;
         }
 
+        movieList.innerHTML = ''; // Clear existing content
+
         movies.forEach(movie => {
             const movieCard = document.createElement('div');
             movieCard.classList.add('movie-card');
-
-            // Check data and handle cases where data might be missing
-            const image = movie.image || 'https://via.placeholder.com/150'; // Default image if none provided
-            const description = movie.description || 'No description available';
-            const title = movie.title || 'No title available';
 
             // Generate HTML for OTT links
             const linksHTML = Object.entries(movie.links)
@@ -55,9 +54,9 @@ async function renderMovies() {
                 .join('<br>');
 
             movieCard.innerHTML = `
-                <img src="${image}" alt="${title} Poster">
-                <h2>${title}</h2>
-                <p>${description}</p>
+                <img src="${movie.image}" alt="${movie.title} Poster">
+                <h2>${movie.title}</h2>
+                <p>${movie.description}</p>
                 ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
             `;
 
