@@ -44,6 +44,11 @@ async function renderMovies() {
             const movieCard = document.createElement('div');
             movieCard.classList.add('movie-card');
 
+            // Check data and handle cases where data might be missing
+            const image = movie.image || 'https://via.placeholder.com/150'; // Default image if none provided
+            const description = movie.description || 'No description available';
+            const title = movie.title || 'No title available';
+
             // Generate HTML for OTT links
             const linksHTML = Object.entries(movie.links)
                 .filter(([platform, link]) => link) // Exclude blank or undefined links
@@ -51,9 +56,9 @@ async function renderMovies() {
                 .join('<br>');
 
             movieCard.innerHTML = `
-                <img src="${movie.image}" alt="${movie.title} Poster">
-                <h2>${movie.title}</h2>
-                <p>${movie.description}</p>
+                <img src="${image}" alt="${title} Poster">
+                <h2>${title}</h2>
+                <p>${description}</p>
                 ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
             `;
 
