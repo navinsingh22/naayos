@@ -45,15 +45,17 @@ async function renderMovies() {
 
             // Generate HTML for OTT links
             const linksHTML = Object.entries(movie.links)
-                .filter(([platform, link]) => link) // Only include platforms with valid links
-                .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
+                .filter(([platform, link]) => link) // Exclude blank or undefined links
+                .map(([platform, link]) => {
+                    return `<a href="${link}" target="_blank">Watch on ${platform}</a>`;
+                })
                 .join('<br>');
 
             movieCard.innerHTML = `
                 <img src="${movie.image}" alt="${movie.title} Poster">
                 <h2>${movie.title}</h2>
                 <p>${movie.description}</p>
-                ${linksHTML}
+                ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
             `;
 
             movieList.appendChild(movieCard);
@@ -63,6 +65,10 @@ async function renderMovies() {
         movieList.innerHTML = '<p>Error loading movies. Please try again later.</p>';
     }
 }
+
+// Call renderMovies to load on page load
+renderMovies();
+
 
 // Call renderMovies to load on page load
 renderMovies();
