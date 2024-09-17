@@ -18,8 +18,9 @@ async function fetchMovies() {
             description: row['Description'],
             image: row['Image URL'],
             links: {
-                'Netflix': row['Netflix Link'],
-                'Amazon Prime': row['Amazon Prime Link']
+                'Netflix': row['Netflix Link'] || '',
+                'Amazon Prime': row['Amazon Prime Link'] || '',
+                'Hulu': row['Hulu Link'] || ''
             }
         }));
 
@@ -46,9 +47,7 @@ async function renderMovies() {
             // Generate HTML for OTT links
             const linksHTML = Object.entries(movie.links)
                 .filter(([platform, link]) => link) // Exclude blank or undefined links
-                .map(([platform, link]) => {
-                    return `<a href="${link}" target="_blank">Watch on ${platform}</a>`;
-                })
+                .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
                 .join('<br>');
 
             movieCard.innerHTML = `
@@ -65,10 +64,6 @@ async function renderMovies() {
         movieList.innerHTML = '<p>Error loading movies. Please try again later.</p>';
     }
 }
-
-// Call renderMovies to load on page load
-renderMovies();
-
 
 // Call renderMovies to load on page load
 renderMovies();
