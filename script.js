@@ -16,7 +16,6 @@ async function fetchMovies() {
         // Map data with proper keys
         const movies = data.map(row => ({
             title: row['Title'] || 'No title available',
-            description: row['Description'] || '', // Set to empty string if no description
             image: row['Image URL'] || 'https://via.placeholder.com/150', // Default image if none provided
             links: {
                 'Netflix': row['Netflix Link'] || '',
@@ -85,8 +84,6 @@ async function renderMovies() {
                 .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
                 .join('<br>');
 
-            // Conditionally include description
-            const descriptionHTML = movie.description ? `<p>${movie.description}</p>` : '';
 
             movieCard.innerHTML = `
                 <div class="movie-card-placeholder">
@@ -94,7 +91,6 @@ async function renderMovies() {
                 </div>
                 <img data-src="${movie.image}" alt="${movie.title} Poster" class="lazy-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAhAQABAAAAAIAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
                 <h2>${movie.title}</h2>
-                ${descriptionHTML}
                 ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
             `;
 
