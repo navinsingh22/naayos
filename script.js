@@ -84,6 +84,7 @@ async function renderMovies() {
 
             movieList.appendChild(movieCard);
         });
+
         lazyLoadImages(); // Call lazyLoadImages after movies have been rendered
     } catch (error) {
         console.error("Error rendering movies:", error);
