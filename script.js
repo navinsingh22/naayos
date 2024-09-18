@@ -1,5 +1,9 @@
 const XLSX_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNb-sN160plE95VvLO2-YNLez--vRTZINYB-OEPMidEEcN-XzVcs6-3PxJ01N2qOp2EkOMS_U3_sKn/pub?output=xlsx';
 
+let movies = [];
+let currentIndex = 0;
+const batchSize = 20; // Number of movies to load at a time
+
 async function fetchMovies() {
     try {
         const response = await fetch(XLSX_URL);
@@ -14,7 +18,7 @@ async function fetchMovies() {
         console.log("Parsed data:", data); // Debugging: check the data
 
         // Map data with proper keys
-        const movies = data.map(row => ({
+        movies = data.map(row => ({
             title: row['Title'] || 'No title available',
             image: row['Image URL'] || 'https://via.placeholder.com/150', // Default image if none provided
             links: {
@@ -22,87 +26,57 @@ async function fetchMovies() {
                 'Amazon Prime': row['Amazon Prime Link'] || ''
             }
         }));
-
-        return movies;
+        
+        console.log("Total movies fetched:", movies.length); // Debugging: total movies fetched
     } catch (error) {
         console.error("Error fetching movies:", error);
-        return []; // Return empty array in case of error
+        movies = []; // Clear movies in case of error
     }
 }
 
-function lazyLoadCards() {
-    const movieCards = document.querySelectorAll('.movie-card');
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const card = entry.target;
-                const img = card.querySelector('img');
-                
-                // Set actual image source
-                if (img && img.dataset.src) {
-                    img.src = img.dataset.src;
-                    img.classList.add('loaded');
-                }
-
-                // Show the card content
-                card.classList.add('loaded');
-
-                // Stop observing once the card has been loaded
-                observer.unobserve(card);
-            }
-        });
-    }, {
-        rootMargin: '0px',
-        threshold: 0.1
-    });
-
-    movieCards.forEach(card => {
-        observer.observe(card);
-    });
-}
-
-async function renderMovies() {
+function renderMovies(startIndex, endIndex) {
     const movieList = document.getElementById('movie-list');
-    try {
-        const movies = await fetchMovies();
+    
+    const movieBatch = movies.slice(startIndex, endIndex);
+    
+    movieBatch.forEach(movie => {
+        const movieCard = document.createElement('div');
+        movieCard.classList.add('movie-card');
+        
+        // Generate HTML for OTT links
+        const linksHTML = Object.entries(movie.links)
+            .filter(([platform, link]) => link) // Exclude blank or undefined links
+            .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
+            .join('<br>');
 
-        if (movies.length === 0) {
-            movieList.innerHTML = '<p>No movies found.</p>';
-            return;
-        }
+        movieCard.innerHTML = `
+            <img src="${movie.image}" alt="${movie.title} Poster" loading="lazy">
+            <h2>${movie.title}</h2>
+            ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
+        `;
 
-        movieList.innerHTML = ''; // Clear existing content
+        movieList.appendChild(movieCard);
+    });
+}
 
-        movies.forEach(movie => {
-            const movieCard = document.createElement('div');
-            movieCard.classList.add('movie-card');
+async function loadMoreMovies() {
+    if (currentIndex >= movies.length) return;
+    const nextIndex = Math.min(currentIndex + batchSize, movies.length);
+    renderMovies(currentIndex, nextIndex);
+    currentIndex = nextIndex;
+}
 
-            // Generate HTML for OTT links
-            const linksHTML = Object.entries(movie.links)
-                .filter(([platform, link]) => link) // Exclude blank or undefined links
-                .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
-                .join('<br>');
-
-
-            movieCard.innerHTML = `
-                <div class="movie-card-placeholder">
-                    <p>Loading...</p>
-                </div>
-                <img data-src="${movie.image}" alt="${movie.title} Poster" class="lazy-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAhAQABAAAAAIAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
-                <h2>${movie.title}</h2>
-                ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
-            `;
-
-            movieList.appendChild(movieCard);
-        });
-
-        lazyLoadCards(); // Call lazyLoadCards after movies have been rendered
-    } catch (error) {
-        console.error("Error rendering movies:", error);
-        movieList.innerHTML = '<p>Error loading movies. Please try again later.</p>';
+function handleScroll() {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadMoreMovies();
     }
 }
 
-// Call renderMovies to load on page load
-renderMovies();
+// Initialize
+async function init() {
+    await fetchMovies();
+    loadMoreMovies();
+    window.addEventListener('scroll', handleScroll);
+}
+
+init();
