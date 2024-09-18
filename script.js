@@ -16,6 +16,7 @@ async function fetchMovies() {
         // Map data with proper keys
         const movies = data.map(row => ({
             title: row['Title'] || 'No title available',
+            description: row['Description'] || '', // Set to empty string if no description
             image: row['Image URL'] || 'https://via.placeholder.com/150', // Default image if none provided
             links: {
                 'Netflix': row['Netflix Link'] || '',
@@ -30,16 +31,26 @@ async function fetchMovies() {
     }
 }
 
-function lazyLoadImages() {
-    const movieCards = document.querySelectorAll('.movie-card img');
-    
+function lazyLoadCards() {
+    const movieCards = document.querySelectorAll('.movie-card');
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src; // Set the actual image URL from data-src attribute
-                img.classList.add('loaded'); // Optional: add a class to handle styles for loaded images
-                observer.unobserve(img); // Stop observing once the image has been loaded
+                const card = entry.target;
+                const img = card.querySelector('img');
+                
+                // Set actual image source
+                if (img && img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.classList.add('loaded');
+                }
+
+                // Show the card content
+                card.classList.add('loaded');
+
+                // Stop observing once the card has been loaded
+                observer.unobserve(card);
             }
         });
     }, {
@@ -47,8 +58,8 @@ function lazyLoadImages() {
         threshold: 0.1
     });
 
-    movieCards.forEach(img => {
-        observer.observe(img);
+    movieCards.forEach(card => {
+        observer.observe(card);
     });
 }
 
@@ -74,16 +85,23 @@ async function renderMovies() {
                 .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
                 .join('<br>');
 
+            // Conditionally include description
+            const descriptionHTML = movie.description ? `<p>${movie.description}</p>` : '';
+
             movieCard.innerHTML = `
-                <img data-src="${movie.image}" alt="${movie.title} Poster" class="lazy-img">
+                <div class="movie-card-placeholder">
+                    <p>Loading...</p>
+                </div>
+                <img data-src="${movie.image}" alt="${movie.title} Poster" class="lazy-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAhAQABAAAAAIAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
                 <h2>${movie.title}</h2>
+                ${descriptionHTML}
                 ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
             `;
 
             movieList.appendChild(movieCard);
         });
 
-        lazyLoadImages(); // Call lazyLoadImages after movies have been rendered
+        lazyLoadCards(); // Call lazyLoadCards after movies have been rendered
     } catch (error) {
         console.error("Error rendering movies:", error);
         movieList.innerHTML = '<p>Error loading movies. Please try again later.</p>';
