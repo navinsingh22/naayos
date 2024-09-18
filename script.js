@@ -31,6 +31,28 @@ async function fetchMovies() {
     }
 }
 
+function lazyLoadImages() {
+    const movieCards = document.querySelectorAll('.movie-card img');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src; // Set the actual image URL from data-src attribute
+                img.classList.add('loaded'); // Optional: add a class to handle styles for loaded images
+                observer.unobserve(img); // Stop observing once the image has been loaded
+            }
+        });
+    }, {
+        rootMargin: '0px',
+        threshold: 0.1
+    });
+
+    movieCards.forEach(img => {
+        observer.observe(img);
+    });
+}
+
 async function renderMovies() {
     const movieList = document.getElementById('movie-list');
     try {
@@ -62,6 +84,7 @@ async function renderMovies() {
 
             movieList.appendChild(movieCard);
         });
+        lazyLoadImages(); // Call lazyLoadImages after movies have been rendered
     } catch (error) {
         console.error("Error rendering movies:", error);
         movieList.innerHTML = '<p>Error loading movies. Please try again later.</p>';
