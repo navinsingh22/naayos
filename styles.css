@@ -47,11 +47,34 @@ header .brand {
     text-align: center;
     padding: 20px;
     transition: transform 0.2s ease-in-out;
+    position: relative;
+}
+
+.movie-card-placeholder {
+    background-color: #eee;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 1rem;
+}
+
+.movie-card.loaded .movie-card-placeholder {
+    display: none; /* Hide placeholder when card content is loaded */
 }
 
 .movie-card img {
     width: 100%;
     border-radius: 10px;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.movie-card img.lazy-img {
+    opacity: 0; /* Hide image initially */
+}
+
+.movie-card img.loaded {
+    opacity: 1; /* Fade in image when loaded */
 }
 
 .movie-card h2 {
@@ -77,14 +100,7 @@ header .brand {
     background-color: #0056b3;
     transform: scale(1.05);
 }
-.lazy-img {
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
 
-.lazy-img.loaded {
-    opacity: 1;
-}
 footer {
     background-color: #333;
     color: white;
