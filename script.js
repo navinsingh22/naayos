@@ -16,7 +16,6 @@ async function fetchMovies() {
         // Map data with proper keys
         const movies = data.map(row => ({
             title: row['Title'] || 'No title available',
-            description: row['Description'] || 'No description available',
             image: row['Image URL'] || 'https://via.placeholder.com/150', // Default image if none provided
             links: {
                 'Netflix': row['Netflix Link'] || '',
