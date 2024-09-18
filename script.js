@@ -77,7 +77,6 @@ async function renderMovies() {
             movieCard.innerHTML = `
                 <img data-src="${movie.image}" alt="${movie.title} Poster" class="lazy-img">
                 <h2>${movie.title}</h2>
-                <p>${movie.description}</p>
                 ${linksHTML || '<p>No links available</p>'} <!-- Display message if no links -->
             `;
 
