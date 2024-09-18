@@ -77,7 +77,14 @@ header .brand {
     background-color: #0056b3;
     transform: scale(1.05);
 }
+.lazy-img {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
 
+.lazy-img.loaded {
+    opacity: 1;
+}
 footer {
     background-color: #333;
     color: white;
