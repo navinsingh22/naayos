@@ -39,6 +39,30 @@ header .brand {
 }
 
 .movie-card {
+    scroll-snap-align: start;
+    flex: 0 0 300px; /* Width of each card */
+    height: auto;
+    margin: 0 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.view-more {
+    margin-top: 20px;
+}
+
+.view-more-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.view-more-btn:hover {
+    background-color: #0056b3;
+}
+
+.movie-card {
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -99,6 +123,28 @@ header .brand {
 .movie-card a:hover {
     background-color: #0056b3;
     transform: scale(1.05);
+}
+
+/* Styles for Carousel Section */
+.carousel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.carousel-wrapper {
+    display: flex;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    width: 100%;
+    max-width: 1200px;
+    padding-bottom: 10px;
+}
+
+.carousel-wrapper::-webkit-scrollbar {
+    display: none;
 }
 .search-container {
     display: flex;
