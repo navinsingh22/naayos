@@ -40,12 +40,18 @@ header .brand {
 
 .movie-card {
     scroll-snap-align: start;
-    flex: 0 0 300px; /* Width of each card */
+    flex: 0 0 300px;
     height: auto;
     margin: 0 10px;
     transition: transform 0.2s ease-in-out;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+    padding: 20px;
+    position: relative;
 }
-
 .view-more {
     margin-top: 20px;
 }
@@ -62,18 +68,6 @@ header .brand {
     background-color: #0056b3;
 }
 
-.movie-card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 15px;
-    width: 300px;
-    text-align: center;
-    padding: 20px;
-    transition: transform 0.2s ease-in-out;
-    position: relative;
-}
-
 .movie-card-placeholder {
     background-color: #eee;
     border-radius: 10px;
@@ -81,6 +75,7 @@ header .brand {
     text-align: center;
     color: #888;
     font-size: 1rem;
+    min-height: 200px; /* Adjust based on typical image size */
 }
 
 .movie-card.loaded .movie-card-placeholder {
