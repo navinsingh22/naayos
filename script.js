@@ -101,38 +101,44 @@ function handleSearch(event) {
 }
 
 async function renderCarouselMovies(limit = 8) {
-    const carouselWrapper = document.querySelector('.carousel-wrapper');
+    const spinner = document.querySelector('#spinner');
     try {
-        const movies = await fetchMovies();
+        const movies = await fetchMovies(); // Fetch movies from the spreadsheet
 
         if (movies.length === 0) {
-            carouselWrapper.innerHTML = '<p>No movies found.</p>';
+            spinner.innerHTML = '<p>No movies found.</p>';
             return;
         }
 
-        const limitedMovies = movies.slice(0, limit); // Get first 'limit' number of movies
+        const limitedMovies = movies.slice(0, limit); // Get the first 'limit' number of movies
 
-        limitedMovies.forEach(movie => {
-            const movieCard = document.createElement('div');
-            movieCard.classList.add('movie-card');
+        // Clear any existing content inside the spinner
+        spinner.innerHTML = '';
 
-            const linksHTML = Object.entries(movie.links)
-                .filter(([platform, link]) => link) // Exclude blank or undefined links
-                .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
-                .join('<br>');
+        limitedMovies.forEach((movie, index) => {
+            const movieImg = document.createElement('img');
+            movieImg.src = movie.image;
+            movieImg.alt = movie.title;
 
-            movieCard.innerHTML = `
-                <img src="${movie.image}" alt="${movie.title} Poster" loading="lazy">
-                <h2>${movie.title}</h2>
-                ${linksHTML || '<p>No links available</p>'}
-            `;
-
-            carouselWrapper.appendChild(movieCard);
+            // Set the rotation for each image based on its index
+            movieImg.style.transform = `rotateY(${index * -45}deg) translateZ(500px)`;
+            spinner.appendChild(movieImg);
         });
     } catch (error) {
         console.error("Error rendering movies:", error);
-        carouselWrapper.innerHTML = '<p>Error loading movies. Please try again later.</p>';
+        spinner.innerHTML = '<p>Error loading movies. Please try again later.</p>';
     }
+}
+
+var angle = 0;
+function galleryspin(sign) { 
+    const spinner = document.querySelector("#spinner");
+    if (!sign) { 
+        angle += 45; 
+    } else { 
+        angle -= 45; 
+    }
+    spinner.style.transform = `rotateY(${angle}deg)`;
 }
 
 // Initialize
