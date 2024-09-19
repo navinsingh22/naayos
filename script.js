@@ -100,10 +100,46 @@ function handleSearch(event) {
     loadMoreMovies(); // Load the filtered results
 }
 
+async function renderCarouselMovies(limit = 8) {
+    const carouselWrapper = document.querySelector('.carousel-wrapper');
+    try {
+        const movies = await fetchMovies();
+
+        if (movies.length === 0) {
+            carouselWrapper.innerHTML = '<p>No movies found.</p>';
+            return;
+        }
+
+        const limitedMovies = movies.slice(0, limit); // Get first 'limit' number of movies
+
+        limitedMovies.forEach(movie => {
+            const movieCard = document.createElement('div');
+            movieCard.classList.add('movie-card');
+
+            const linksHTML = Object.entries(movie.links)
+                .filter(([platform, link]) => link) // Exclude blank or undefined links
+                .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
+                .join('<br>');
+
+            movieCard.innerHTML = `
+                <img src="${movie.image}" alt="${movie.title} Poster" loading="lazy">
+                <h2>${movie.title}</h2>
+                ${linksHTML || '<p>No links available</p>'}
+            `;
+
+            carouselWrapper.appendChild(movieCard);
+        });
+    } catch (error) {
+        console.error("Error rendering movies:", error);
+        carouselWrapper.innerHTML = '<p>Error loading movies. Please try again later.</p>';
+    }
+}
+
 // Initialize
 async function init() {
     await fetchMovies();
     loadMoreMovies();
+    renderCarouselMovies(); // Call this function to load carousel movies
     window.addEventListener('scroll', handleScroll);
 
     // Add search functionality
