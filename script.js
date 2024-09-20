@@ -25,7 +25,7 @@ async function fetchMovies() {
             }
         }));
 
-        filteredMovies = [...movies];
+        filteredMovies = [...movies]; // Keep all movies in filteredMovies initially
         fuse = new Fuse(movies, { keys: ['title'], threshold: 0.3, includeScore: true });
         return movies;
     } catch (error) {
@@ -34,6 +34,7 @@ async function fetchMovies() {
     }
 }
 
+// Renders a batch of movie cards
 function renderMovies(startIndex, endIndex) {
     const movieList = document.getElementById('movie-list');
     const movieBatch = filteredMovies.slice(startIndex, endIndex);
@@ -43,7 +44,7 @@ function renderMovies(startIndex, endIndex) {
         movieCard.classList.add('movie-card');
 
         const linksHTML = Object.entries(movie.links)
-            .filter(([platform, link]) => link)
+            .filter(([platform, link]) => link) // Only show platforms with valid links
             .map(([platform, link]) => `<a href="${link}" target="_blank">Watch on ${platform}</a>`)
             .join('<br>');
 
@@ -57,9 +58,10 @@ function renderMovies(startIndex, endIndex) {
     });
 }
 
+// Renders movies in the carousel
 async function renderCarouselMovies() {
     const carouselContainer = document.getElementById('carousel-container');
-    const movies = await fetchMovies();
+    const movies = await fetchMovies(); // Fetch movies if not done already
 
     movies.slice(0, 6).forEach(movie => {
         const movieItem = document.createElement('li');
@@ -77,52 +79,57 @@ async function renderCarouselMovies() {
     });
 }
 
+// Handles the carousel controls for sliding next/prev
 function activate(e) {
     const items = document.querySelectorAll('.item');
     const slider = document.querySelector('.slider');
 
     if (e.target.matches('.next')) {
-        slider.append(items[0]);
+        slider.append(items[0]); // Move the first item to the end
     } else if (e.target.matches('.prev')) {
-        slider.prepend(items[items.length - 1]);
+        slider.prepend(items[items.length - 1]); // Move the last item to the front
     }
 }
 
 document.addEventListener('click', activate, false);
 
+// Load more movies for infinite scroll
 function loadMoreMovies() {
     renderMovies(currentIndex, currentIndex + batchSize);
     currentIndex += batchSize;
 }
 
+// Infinite scrolling event handler
 function handleScroll() {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
-        loadMoreMovies();
+        loadMoreMovies(); // Load more movies when scrolled near bottom
     }
 }
 
+// Handles the search functionality with Fuse.js
 function handleSearch(event) {
     const searchTerm = event.target.value.trim();
     if (searchTerm === '') {
-        filteredMovies = [...movies];
+        filteredMovies = [...movies]; // Reset to all movies if search is empty
     } else {
         const results = fuse.search(searchTerm).map(result => result.item);
         filteredMovies = results;
     }
-    document.getElementById('movie-list').innerHTML = ''; // Clear existing content
-    currentIndex = 0; // Reset index
-    loadMoreMovies(); // Re-render filtered movies
+    document.getElementById('movie-list').innerHTML = ''; // Clear the current movie list
+    currentIndex = 0; // Reset the index for infinite scroll
+    loadMoreMovies(); // Render the new filtered movies
 }
 
+// Initialize the page by fetching data and setting up scroll and search events
 async function init() {
-    await fetchMovies();
-    loadMoreMovies();
-    renderCarouselMovies();
+    await fetchMovies(); // Fetch the movie data once
+    loadMoreMovies(); // Render the first batch of movies
+    renderCarouselMovies(); // Render the movies in the carousel
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll); // Set up infinite scroll
 
     const searchInput = document.getElementById('search-input');
-    searchInput.addEventListener('input', handleSearch);
+    searchInput.addEventListener('input', handleSearch); // Set up search input event
 }
 
 init();
