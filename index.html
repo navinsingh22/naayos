@@ -16,22 +16,23 @@
     <div class="announcement-banner">
         <p>All the movies and TV shows under one roof!</p>
     </div>
-    
+
     <!-- Search Bar -->
     <div class="search-container">
         <input type="text" id="search-input" placeholder="Search for movies or shows...">
     </div>
 
-    <!-- Carousel Section -->
-    <section id="carousel">
-        <figure id="spinner">
-            <!-- Movie cards will be dynamically inserted here -->  
-        </figure>
-    </section>
-    
-    <span style="float:left" class="ss-icon" onclick="galleryspin('-')">&lt;</span>
-    <span style="float:right" class="ss-icon" onclick="galleryspin('')">&gt;</span>
-   
+    <!-- New Carousel Section -->
+    <main>
+        <ul class="slider" id="carousel-container">
+            <!-- Movie slides will be dynamically inserted here -->
+        </ul>
+        <nav class="nav">
+            <ion-icon class="btn prev" name="arrow-back-outline"></ion-icon>
+            <ion-icon class="btn next" name="arrow-forward-outline"></ion-icon>
+        </nav>
+    </main>
+
     <section class="content" id="movie-list">
         <!-- Movies will be dynamically inserted here -->
     </section>
