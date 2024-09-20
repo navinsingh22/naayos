@@ -123,6 +123,29 @@ function handleSearch(event) {
     loadMoreMovies(); // Render the new filtered movies
 }
 
+let currentSlideIndex = 0; // To track the current slide
+
+function nextSlide() {
+    const items = document.querySelectorAll('.item');
+    if (items.length === 0) return; // Check if there are any items
+    currentSlideIndex = (currentSlideIndex + 1) % items.length; // Move to the next slide
+    updateCarousel();
+}
+
+function prevSlide() {
+    const items = document.querySelectorAll('.item');
+    if (items.length === 0) return; // Check if there are any items
+    currentSlideIndex = (currentSlideIndex - 1 + items.length) % items.length; // Move to the previous slide
+    updateCarousel();
+}
+
+function updateCarousel() {
+    const items = document.querySelectorAll('.item');
+    items.forEach((item, index) => {
+        item.style.transform = `translateX(${(index - currentSlideIndex) * 100}%)`; // Adjust position
+    });
+}
+
 // Initialize the page by fetching data and setting up scroll and search events
 async function init() {
     await fetchMovies(); // Fetch the movie data once
