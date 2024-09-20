@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies and TV Shows</title>
+    <title>Movie List</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,8 +13,19 @@
         </div>
     </header>
 
-    <div class="announcement-banner">
+	<div class="announcement-banner">
         <p>All the movies and TV shows under one roof!</p>
+    </div>
+	
+    <!-- Carousel Container -->
+    <div id="carousel-container">
+        <div class="carousel">
+            <ul id="carousel-slides"></ul>
+            <div class="nav">
+                <span class="btn prev" onclick="prevSlide()">❮</span>
+                <span class="btn next" onclick="nextSlide()">❯</span>
+            </div>
+        </div>
     </div>
 
     <!-- Search Bar -->
@@ -22,29 +33,17 @@
         <input type="text" id="search-input" placeholder="Search for movies or shows...">
     </div>
 
-    <!-- New Carousel Section -->
-    <main>
-        <ul class="slider" id="carousel-container">
-            <!-- Movie slides will be dynamically inserted here -->
-        </ul>
-        <nav class="nav">
-            <ion-icon class="btn prev" name="arrow-back-outline"></ion-icon>
-            <ion-icon class="btn next" name="arrow-forward-outline"></ion-icon>
-        </nav>
-    </main>
-
-    <section class="content" id="movie-list">
-        <!-- Movies will be dynamically inserted here -->
-    </section>
+	<!-- Infinite Scroll Movie List -->
+    <div id="movie-list"></div>
 
     <footer>
-        <p>&copy; 2024 Movie Redirects</p>
+        <p>&copy; 2024 My Brand. All Rights Reserved.</p>
     </footer>
 
-    <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
