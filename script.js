@@ -2,7 +2,7 @@ const XLSX_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNb-sN160plE9
 
 let movies = [];
 let currentIndex = 0;
-const batchSize = 20; // Number of movies to load at a time
+const batchSize = 20;
 let filteredMovies = [];
 let fuse;
 
@@ -10,19 +10,15 @@ async function fetchMovies() {
     try {
         const response = await fetch(XLSX_URL);
         const arrayBuffer = await response.arrayBuffer();
-
-        // Parse the XLSX file
         const workbook = XLSX.read(arrayBuffer, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const data = XLSX.utils.sheet_to_json(sheet);
 
-        console.log("Parsed data:", data);
-
-        // Map data with proper keys
         movies = data.map(row => ({
             title: row['Title'] || 'No title available',
             image: row['Image URL'] || 'https://via.placeholder.com/150',
+            description: row['Description'] || 'No description available',
             links: {
                 'Netflix': row['Netflix Link'] || '',
                 'Amazon Prime': row['Amazon Prime Link'] || ''
@@ -30,14 +26,7 @@ async function fetchMovies() {
         }));
 
         filteredMovies = [...movies];
-
-        // Initialize Fuse.js for fuzzy search with custom options
-        fuse = new Fuse(movies, {
-            keys: ['title'],  // Search by title
-            threshold: 0.3, // Set how fuzzy the search is (lower is stricter)
-            includeScore: true // Optional: Can include scores of matching
-        });
-
+        fuse = new Fuse(movies, { keys: ['title'], threshold: 0.3, includeScore: true });
         return movies;
     } catch (error) {
         console.error("Error fetching movies:", error);
@@ -68,87 +57,70 @@ function renderMovies(startIndex, endIndex) {
     });
 }
 
-async function loadMoreMovies() {
-    if (currentIndex >= filteredMovies.length) return;
-    const nextIndex = Math.min(currentIndex + batchSize, filteredMovies.length);
-    renderMovies(currentIndex, nextIndex);
-    currentIndex = nextIndex;
+async function renderCarouselMovies() {
+    const carouselContainer = document.getElementById('carousel-container');
+    const movies = await fetchMovies();
+
+    movies.slice(0, 6).forEach(movie => {
+        const movieItem = document.createElement('li');
+        movieItem.classList.add('item');
+        movieItem.style.backgroundImage = `url(${movie.image})`;
+
+        movieItem.innerHTML = `
+            <div class="content">
+                <h2 class="title">${movie.title}</h2>
+                <p class="description">${movie.description}</p>
+            </div>
+        `;
+
+        carouselContainer.appendChild(movieItem);
+    });
+}
+
+function activate(e) {
+    const items = document.querySelectorAll('.item');
+    const slider = document.querySelector('.slider');
+
+    if (e.target.matches('.next')) {
+        slider.append(items[0]);
+    } else if (e.target.matches('.prev')) {
+        slider.prepend(items[items.length - 1]);
+    }
+}
+
+document.addEventListener('click', activate, false);
+
+function loadMoreMovies() {
+    renderMovies(currentIndex, currentIndex + batchSize);
+    currentIndex += batchSize;
 }
 
 function handleScroll() {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
         loadMoreMovies();
     }
 }
 
-// Update the handleSearch function to use Fuse.js for fuzzy search
 function handleSearch(event) {
     const searchTerm = event.target.value.trim();
-
-    if (!searchTerm) {
-        filteredMovies = [...movies]; // Reset to full list if search is empty
+    if (searchTerm === '') {
+        filteredMovies = [...movies];
     } else {
-        const result = fuse.search(searchTerm);
-        filteredMovies = result.map(r => r.item); // Extract matching items
+        const results = fuse.search(searchTerm).map(result => result.item);
+        filteredMovies = results;
     }
-
-    // Reset current index and clear existing content
-    currentIndex = 0;
-    const movieList = document.getElementById('movie-list');
-    movieList.innerHTML = '';
-
-    loadMoreMovies(); // Load the filtered results
+    document.getElementById('movie-list').innerHTML = ''; // Clear existing content
+    currentIndex = 0; // Reset index
+    loadMoreMovies(); // Re-render filtered movies
 }
 
-async function renderCarouselMovies(limit = 8) {
-    const spinner = document.querySelector('#spinner');
-    try {
-        const movies = await fetchMovies(); // Fetch movies from the spreadsheet
-
-        if (movies.length === 0) {
-            spinner.innerHTML = '<p>No movies found.</p>';
-            return;
-        }
-
-        const limitedMovies = movies.slice(0, limit); // Get the first 'limit' number of movies
-
-        // Clear any existing content inside the spinner
-        spinner.innerHTML = '';
-
-        limitedMovies.forEach((movie, index) => {
-            const movieImg = document.createElement('img');
-            movieImg.src = movie.image;
-            movieImg.alt = movie.title;
-
-            // Set the rotation for each image based on its index
-            movieImg.style.transform = `rotateY(${index * -45}deg) translateZ(500px)`;
-            spinner.appendChild(movieImg);
-        });
-    } catch (error) {
-        console.error("Error rendering movies:", error);
-        spinner.innerHTML = '<p>Error loading movies. Please try again later.</p>';
-    }
-}
-
-var angle = 0;
-function galleryspin(sign) { 
-    const spinner = document.querySelector("#spinner");
-    if (!sign) { 
-        angle += 45; 
-    } else { 
-        angle -= 45; 
-    }
-    spinner.style.transform = `rotateY(${angle}deg)`;
-}
-
-// Initialize
 async function init() {
     await fetchMovies();
     loadMoreMovies();
-    renderCarouselMovies(); // Call this function to load carousel movies
+    renderCarouselMovies();
+
     window.addEventListener('scroll', handleScroll);
 
-    // Add search functionality
     const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', handleSearch);
 }
