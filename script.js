@@ -60,10 +60,13 @@ function renderMovies(startIndex, endIndex) {
 
 // Renders movies in the carousel
 async function renderCarouselMovies() {
-    const carouselContainer = document.getElementById('carousel-container');
+    const carouselSlides = document.getElementById('carousel-slides'); // Select the correct UL element
     const movies = await fetchMovies(); // Fetch movies if not done already
 
-    movies.slice(0, 6).forEach(movie => {
+    // Clear any existing slides
+    carouselSlides.innerHTML = '';
+
+    movies.slice(0, 8).forEach(movie => {
         const movieItem = document.createElement('li');
         movieItem.classList.add('item');
         movieItem.style.backgroundImage = `url(${movie.image})`;
@@ -75,7 +78,7 @@ async function renderCarouselMovies() {
             </div>
         `;
 
-        carouselContainer.appendChild(movieItem);
+        carouselSlides.appendChild(movieItem);
     });
 }
 
