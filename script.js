@@ -75,6 +75,7 @@ async function renderCarouselMovies() {
             <div class="content">
                 <h2 class="title">${movie.title}</h2>
                 <p class="description">${movie.description}</p>
+                <button onclick="window.open('${movie.links['Amazon Prime']}', '_blank')">Watch on Amazon Prime</button>` : ''}
             </div>
         `;
 
